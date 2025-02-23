@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>قائمة المطعم</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .menu-container {
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+        .menu-container.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        body {
+            background-color: #f7f3e9;
+            color: #5a5a5a;
+        }
+        .tab-button {
+            background-color: #d8cfc4;
+            color: #4a4a4a;
+            margin-left: 4px;
+            margin-right: 4px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        .tab-button:hover {
+            background-color: #c1b6a4;
+        }
+        .tab-button.active {
+            background-color: #a38f75;
+            color: #fff;
+        }
+        .loading {
+            text-align: center;
+        }
+        .loading svg {
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        img {
+            border-radius: 12px;
+            transition: transform 0.3s ease;
+        }
+        img:hover {
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 p-4">
+    <div class="max-w-7xl mx-auto p-4">
+        <div class="flex flex-col sm:flex-row justify-between items-center mb-6">
+            <img src="image/logo.avif" alt="شعار المطعم" class="h-20 w-50 mb-4 sm:mb-0">
+            <h1 class="text-3xl sm:text-4xl font-bold text-gray-800 text-center sm:text-right">قائمتنا</h1>
+        </div>
+        
+        <div class="flex overflow-x-auto bg-white p-2 rounded-lg shadow-md mb-6">
+            <button class="tab-button px-6 py-3 font-semibold rounded-lg transition-all w-full sm:w-auto mb-2 sm:mb-0" data-category="المقبلات">المقبلات</button>
+            <button class="tab-button px-6 py-3 font-semibold rounded-lg transition-all w-full sm:w-auto mb-2 sm:mb-0" data-category="الأطباق الرئيسية">الأطباق الرئيسية</button>
+            <button class="tab-button px-6 py-3 font-semibold rounded-lg transition-all w-full sm:w-auto mb-2 sm:mb-0" data-category="الحلويات">الحلويات</button>
+            <button class="tab-button px-6 py-3 font-semibold rounded-lg transition-all w-full sm:w-auto mb-2 sm:mb-0" data-category="المشروبات">المشروبات</button>
+            <button class="tab-button px-6 py-3 font-semibold rounded-lg transition-all w-full sm:w-auto mb-2 sm:mb-0" data-category="البيتزا">البيتزا</button>
+            <button class="tab-button px-6 py-3 font-semibold rounded-lg transition-all w-full sm:w-auto mb-2 sm:mb-0" data-category="الباستا">الباستا</button>
+            <button class="tab-button px-6 py-3 font-semibold rounded-lg transition-all w-full sm:w-auto mb-2 sm:mb-0" data-category="السلطات">السلطات</button>
+        </div>
+
+        <!-- عنصر تحميل -->
+        <div id="loading" class="loading hidden">
+            <svg class="h-5 w-5 mx-auto text-gray-700" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle>
+            </svg>
+            <p>جارٍ تحميل القائمة...</p>
+        </div>
+
+        <div id="menu-container" class="menu-container grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            <!-- سيتم إدراج العناصر هنا -->
+        </div>
+    </div>
+
+    <script>
+        const menuData = {
+            "المقبلات": [
+                { name: "كبة مقلية", price: "22.50 ريال", calories: "300 سعرة حرارية", image: "image/coba.avif" },
+                { name: "حمص", price: "7.00 ريال", calories: "150 سعرة حرارية", image: "image/homs.avif" },
+                { name: "ورق عنب", price: "9.00 ريال", calories: "250 سعرة حرارية", image: "image/anp.avif" }
+            ],
+            "الأطباق الرئيسية": [
+                { name: "صحن مشويات", price: "49.00 ريال", calories: "600 سعرة حرارية", image: "image/Grills.jpg" },
+                { name: "رز برياني ", price: "40.00 ريال", calories: "700 سعرة حرارية", image: "image/bryane.avif" },
+                { name: "شيش طاووق", price: "22.00 ريال", calories: "400 سعرة حرارية", image: "image/shec.avif" }
+            ],
+            "الحلويات": [
+                { name: "شوكلت دونات", price: "8.50 ريال", calories: "800 سعرة حرارية", image: "image/choklitdont.avif" },
+                { name: "كنافة", price: "11.00 ريال", calories: "750 سعرة حرارية", image: "image/conafa.avif" },
+                { name: "بانكيك", price: "24.00 ريال", calories: "800 سعرة حرارية", image: "image/bankec.avif" }
+            ],
+            "المشروبات": [
+                { name: "كولا", price: "3.00 ريال", calories: "150 سعرة حرارية", image: "image/cola.jpeg" },
+                { name: "عصير برتقال", price: "7.00 ريال", calories: "20 سعرة حرارية", image: "image/orange.avif" },
+                { name: "ماء", price: "2.00 ريال", calories: "0 سعرة حرارية", image: "image/water.avif" }
+            ],
+            "البيتزا": [
+                { name: "بيتزا مكسيكي", price: "35.00 ريال", calories: "800 سعرة حرارية", image: "image/bettzamixeco.jpg" },
+                { name: "بيتزا بيبروني", price: "35.00 ريال", calories: "900 سعرة حرارية", image: "image/bebrone.avif" },
+                { name: "بيتزا خضار", price: "35.00 ريال", calories: "750 سعرة حرارية", image: "image/bettzakhotar.avif" }
+            ],
+            "الباستا": [
+                { name: "باستا فوتشيني", price: "33.00 ريال", calories: "700 سعرة حرارية", image: "image/bastafothcne.avif" },
+                { name: "باستا بولو", price: "33.00 ريال", calories: "750 سعرة حرارية", image: "image/bastabolo.avif" },
+                { name: "باستا عادي ", price: "33.00 ريال", calories: "650 سعرة حرارية", image: "image/basta.avif" }
+            ],
+            "السلطات": [
+                { name: "سلطة يونانية", price: "16.00 ريال", calories: "150 سعرة حرارية", image: "image/salatyounan.avif" },
+                { name: "سلطة تبولة", price: "16.00 ريال", calories: "180 سعرة حرارية", image: "image/salattbola.jpg" },
+                { name: "سلطة فواكه", price: "16.00 ريال", calories: "220 سعرة حرارية", image: "image/salatfrut.avif" }
+            ]
+        };
+
+        function renderMenu(category) {
+            const container = document.getElementById("menu-container");
+            const loading = document.getElementById("loading");
+            loading.classList.remove("hidden");
+            container.classList.remove("show");
+            setTimeout(() => {
+                container.innerHTML = "";
+                menuData[category].forEach(item => {
+                    const card = `
+                        <div class="p-4 shadow-lg rounded-lg bg-white hover:shadow-xl transition-all">
+                            <img src="${item.image}" alt="${item.name}" class="w-full h-48 object-cover rounded-lg">
+                            <div class="p-4 text-center">
+                                <h2 class="text-xl font-semibold text-gray-800">${item.name}</h2>
+                                <p class="text-gray-500">${item.price}</p>
+                                <p class="text-gray-400">${item.calories}</p>
+                            </div>
+                        </div>
+                    `;
+                    container.innerHTML += card;
+                });
+                container.classList.add("show");
+                loading.classList.add("hidden");
+            }, 300);
+        }
+
+        document.querySelectorAll(".tab-button").forEach(button => {
+            button.addEventListener("click", () => {
+                document.querySelectorAll(".tab-button").forEach(b => b.classList.remove("active"));
+                button.classList.add("active");
+                renderMenu(button.dataset.category);
+            });
+        });
+
+        // تحميل الفئة الافتراضية
+        renderMenu("المقبلات");
+    </script>
+</body>
+</html>
